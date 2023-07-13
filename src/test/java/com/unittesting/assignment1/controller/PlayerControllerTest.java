@@ -41,9 +41,7 @@ class PlayerControllerTest {
 
   static String getJsonObject(Object object) throws JsonProcessingException {
     ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-    String requestJson = ow.writeValueAsString(object);
+    String requestJson = mapper.writeValueAsString(object);
     return requestJson;
   }
 
@@ -90,16 +88,18 @@ class PlayerControllerTest {
       String jsonObject = getJsonObject(player);
 
       when(playerService.createPlayer(player)).thenReturn(player);
-      mockMvc.perform(post("/api/v1/players").contentType(MediaType.APPLICATION_JSON).content(jsonObject)).andDo(print()).andExpect(status().isCreated());
+      mockMvc.perform(post("/api/v1/players")
+              .contentType(MediaType.APPLICATION_JSON).content(jsonObject)).andDo(print()).andExpect(status().isCreated());
     }
 
     @Test
-    @DisplayName("Negative Scenario: Error While Add Players")
+    @DisplayName("Failed Scenario: Error While Add Players")
     void whenCreatePlayer_thenReturn_negative() throws Exception {
       String jsonObject = getJsonObject(player);
 
       when(playerService.createPlayer(player)).thenReturn(null);
-      mockMvc.perform(post("/api/v1/players").contentType(MediaType.APPLICATION_JSON).content(jsonObject)).andDo(print()).andExpect(status().isNotFound());
+      mockMvc.perform(post("/api/v1/players")
+              .contentType(MediaType.APPLICATION_JSON).content(jsonObject)).andDo(print()).andExpect(status().isNotFound());
     }
   }
 
@@ -136,17 +136,20 @@ class PlayerControllerTest {
       String jsonObject = getJsonObject(updatedPlayer);
 
       when(playerService.updatePlayer(updatedPlayer, 1)).thenReturn(updatedPlayer);
-      mockMvc.perform(put("/api/v1/players/1").contentType(MediaType.APPLICATION_JSON).content(jsonObject)).andDo(print()).andExpect(status().isCreated());
+      mockMvc.perform(put("/api/v1/players/1")
+              .contentType(MediaType.APPLICATION_JSON).content(jsonObject)).andDo(print()).andExpect(status().isCreated());
     }
 
     @Test
-    @DisplayName("Negative Scenario: Update Players")
+    @DisplayName("Failed Scenario: Update Players")
     void whenUpdatePlayer_thenReturn_negative() throws Exception {
       Player updatedPlayer = Player.builder().playerId(player.getPlayerId()).playerName("shailesh").team(team).build();
       String jsonObject = getJsonObject(updatedPlayer);
 
       when(playerService.updatePlayer(updatedPlayer, 1)).thenReturn(updatedPlayer);
-      mockMvc.perform(put("/api/v1/players/2").contentType(MediaType.APPLICATION_JSON).content(jsonObject)).andDo(print()).andExpect(status().isNotFound());
+      mockMvc.perform(put("/api/v1/players/2").
+              contentType(MediaType.APPLICATION_JSON)
+              .content(jsonObject)).andDo(print()).andExpect(status().isNotFound());
     }
 
   }
@@ -163,7 +166,7 @@ class PlayerControllerTest {
     }
 
     @Test
-    @DisplayName("Negative scenario: delete player")
+    @DisplayName("Failed scenario: delete player")
     void whenDeletePlayer_thenReturn_Negative() throws Exception {
 
       doAnswer(Answers.CALLS_REAL_METHODS).when(playerService).deletePlayer(1);
